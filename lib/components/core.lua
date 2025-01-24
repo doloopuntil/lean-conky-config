@@ -165,9 +165,9 @@ function core.cpu(args)
 end
 
 lcc.tpl.memory = [[
-${color2}${lua font h2 RAM}${font}${color} ${alignc $sr{-16}}${mem} / ${memmax} ${alignr}${memperc}%
+${lua font h2 RAM}${font} ${alignc $sr{-16}}${mem} / ${memmax} ${alignr}${memperc}%
 ${color3}${membar}${color}
-${color2}${lua font h2 SWAP}${font}${color} ${alignc $sr{-16}}${swap} / ${swapmax} ${alignr}${swapperc}%
+${lua font h2 SWAP}${font} ${alignc $sr{-16}}${swap} / ${swapmax} ${alignr}${swapperc}%
 ${color3}${swapbar}${color}
 {% if top_mem_entries then %}
 ${color2}${lua font h2 {PROCESS ${goto $sr{156}}PID ${goto $sr{198}}CPU%${alignr}MEM%}}${font}${color}#
