@@ -220,6 +220,8 @@ function conky_disks(interv)
                 name = media
             elseif name == utils.env.HOME then
                 name = "${lua font icon_s  ${voffset $sr{-4}}${font :bold:size=$sc{11}}⌂}"
+            elseif lcc.config.storage_use_labels then
+                name = disk.label
             end
 
             table.insert(disks, {

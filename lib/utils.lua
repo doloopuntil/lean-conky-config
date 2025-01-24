@@ -137,13 +137,13 @@ function utils.enum_disks(include_types, exclude_types, exclude_targets)
         utils.str_to_array(exclude_types), true
     )
 
-    local cmd = "findmnt -bPUno TARGET,FSTYPE,SIZE,USED -t " .. utils.join_strs(fs_types, ",")
-    local entry_pattern = '^TARGET="(.+)"%s+FSTYPE="(.+)"%s+SIZE="(.+)"%s+USED="(.+)"$'
+    local cmd = "findmnt -bPUno TARGET,LABEL,FSTYPE,SIZE,USED -t " .. utils.join_strs(fs_types, ",")
+    local entry_pattern = '^TARGET="(.+)"%s+LABEL="(.+)"%s+FSTYPE="(.+)"%s+SIZE="(.+)"%s+USED="(.+)"$'
     local mnt_fs = utils.sys_call(cmd)
     local mnts = {}
 
     for _, l in ipairs(mnt_fs) do
-        local mnt, type, size, used = l:match(entry_pattern)
+        local mnt, label, type, size, used = l:match(entry_pattern)
 
         for _, p in ipairs(utils.str_to_array(exclude_targets) or {}) do
             if mnt == nil or mnt:match(p) then
@@ -154,6 +154,7 @@ function utils.enum_disks(include_types, exclude_types, exclude_targets)
         if mnt and utils.is_dir(mnt) and utils.is_readable(mnt) then
             table.insert(mnts, {
                 mnt = mnt,
+                label = label,
                 type = type,
                 size = tonumber(size),
                 used = tonumber(used)
