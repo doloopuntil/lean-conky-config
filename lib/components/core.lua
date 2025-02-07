@@ -150,13 +150,18 @@ local function get_top_entries(max, dev, types, padded_len, align)
 end
 
 lcc.tpl.cpu = [[
-${font}${execi 3600 grep model /proc/cpuinfo | cut -d : -f2 | tail -1 | sed 's/\s//'} ${alignr} ${cpu cpu0}%
+${font}${execi 3600 grep model /proc/cpuinfo | cut -d : -f2 | tail -1 | sed 's/\s//'} ${alignr}${cpu cpu0}%
 ${color3}${cpugraph cpu0}${color}
 {% if top_cpu_entries then %}
-${color2}${lua font h2 {PROCESS ${goto $sr{156}}PID ${goto $sr{194}}MEM% ${alignr}CPU%}}${font}${color}#
+${color2}${lua font h2 {PROCESS ${goto {%= lcc.col2_position %}}PID ${alignr {%= lcc.col3_offset %}}MEM%
+${voffset $sr{-13}}${alignr}CPU%}}#
+${font}${color}#
 {% for _, v in ipairs(top_cpu_entries) do +%}
-{%= v.name %} ${goto $sr{156}}{%= v.pid %}${alignr}${offset $sr{-44}}{%= v.mem %}
-${voffset $sr{-13}}${alignr}{%= v.cpu %}{% end %}{% end %}]]
+{%= v.name %} ${goto {%= lcc.col2_position %}}{%= v.pid %}${alignr {%= lcc.col3_offset %}}{%= v.mem %}
+${voffset $sr{-13}}${alignr}{%= v.cpu %}#
+{% end %}#
+{% end %}#
+]]
 function core.cpu(args)
     local top_n = utils.table.get(args, 'top_n', 5)
     return core.section("CPU", "") .. "\n" .. lcc.tpl.cpu {
@@ -165,15 +170,22 @@ function core.cpu(args)
 end
 
 lcc.tpl.memory = [[
-${lua font h2 RAM}${font} ${alignc $sr{-16}}${mem} / ${memmax} ${alignr}${memperc}%
+${lua font h2 RAM}${font}${alignr}${memperc}%
+${voffset $sr{-13}}${alignc}${mem} / ${memmax}
 ${color3}${membar}${color}
-${lua font h2 SWAP}${font} ${alignc $sr{-16}}${swap} / ${swapmax} ${alignr}${swapperc}%
+${lua font h2 SWAP}${font}${alignr}${swapperc}%
+${voffset $sr{-13}}${alignc}${swap} / ${swapmax}
 ${color3}${swapbar}${color}
 {% if top_mem_entries then %}
-${color2}${lua font h2 {PROCESS ${goto $sr{156}}PID ${goto $sr{198}}CPU%${alignr}MEM%}}${font}${color}#
+${color2}${lua font h2 {PROCESS ${goto {%= lcc.col2_position %}}PID ${alignr {%= lcc.col3_offset %}}CPU%
+${voffset $sr{-13}}${alignr}MEM%}}#
+${font}${color}#
 {% for _, v in ipairs(top_mem_entries) do +%}
-{%= v.name %} ${goto $sr{156}}{%= v.pid %}${alignr}${offset $sr{-44}}{%= v.cpu %}
-${voffset $sr{-13}}${alignr}{%= v.mem %}{% end %}{% end %}]]
+{%= v.name %} ${goto {%= lcc.col2_position %}}{%= v.pid %}${alignr {%= lcc.col3_offset %}}{%= v.cpu %}
+${voffset $sr{-13}}${alignr}{%= v.mem %}#
+{% end %}#
+{% end %}#
+]]
 function core.memory(args)
     local top_n = utils.table.get(args, 'top_n', 5)
     return core.section("MEMORY", "") .. "\n" .. lcc.tpl.memory {
@@ -186,9 +198,12 @@ ${lua disks 5}
 ${voffset $sr{4}}${lua font icon_s {} {Read:}} ${font}${diskio_read} ${alignr}${lua font icon_s {} {Write: }}${font}${diskio_write}${lua font icon_s { } {}}
 ${color3}${diskiograph_read {%= lcc.half_graph_size %}} ${alignr}${diskiograph_write {%= lcc.half_graph_size %}}${color}
 {% if top_io_entries then %}
-${color2}${lua font h2 {PROCESS ${goto $sr{156}}PID ${alignr}READ/WRITE}}${font}${color}#
+${color2}${lua font h2 {PROCESS ${goto {%= lcc.col2_position %}}PID ${alignr}READ/WRITE}}${font}${color}#
 {% for _, v in ipairs(top_io_entries) do +%}
-{%= v.name %} ${goto $sr{156}}{%= v.pid %} ${alignr}{%= v.io_read %} / {%= v.io_write %}{% end %}{% end %}]]
+{%= v.name %} ${goto {%= lcc.col2_position %}}{%= v.pid %} ${alignr}{%= v.io_read %} / {%= v.io_write %}#
+{% end %}#
+{% end %}#
+]]
 function core.storage(args)
     local top_n = utils.table.get(args, 'top_n', 5)
     return core.section("STORAGE", "") .. "\n" .. lcc.tpl.storage {
@@ -200,7 +215,8 @@ end
 lcc.tpl.disks = [[
 {% if disks then %}
 {% for _, v in ipairs(disks) do %}
-${lua font h2 {{%= v.name %}}}${font} ${alignc $sr{-8}}{%= v.used_h %} / {%= v.size_h %} [{%= v.type %}] ${alignr}{%= v.used_perc %}%
+${lua font h2 {{%= v.name %}}}${font}${alignr}{%= v.used_perc %}%
+${voffset $sr{-13}}${alignc}{%= v.used_h %} / {%= v.size_h %} [{%= v.type %}]
 ${color3}${lua_bar ratio_perc {%= v.used %} {%= v.size %}}${color}
 {% end %}
 {% else %}
